@@ -1,4 +1,5 @@
 var mongodbinit = require('./mongodbinit.js');
+var request = require('request');
 
 function insert(data, callback) {
     var collection = mongodbinit.getDb().collection('c1');
@@ -23,10 +24,18 @@ function query(data, sort, limit, callback) {
 
 module.exports = {
     trigger: function (req, res) {
-        insert([{ a: 1, time: new Date() }]
-            , function (result) {
-                res.status(200).send('Inserted 3 documents into the document collection');
-            });
+        request('http://www.stateair.net/mobile/post/1/1.html', function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var position = body.indexOf('Most Recent AQI');
+                position = body.indexOf('<span class="aqi_', position);
+                var aqi = body.substring(position + 20, body.indexOf('</span>', position + 20)).trim();
+                remove({ type: 'weather' }, function (result) {
+                    insert({ type: 'weather', time: new Date(), str: aqi }, function (result) {
+                        res.sendStatus(200);
+                    });
+                });
+            }
+        })
     },
 
     remove: function (req, res) {
@@ -36,8 +45,10 @@ module.exports = {
     },
 
     query: function (req, res) {
-        query({}, { time: -1 }, 1, function (result) {
-            res.status(200).send(JSON.stringify(result));
+        query({ type: 'weather' }, { time: -1 }, 1, function (docs) {
+            docs.forEach(function (doc) {
+                res.render('./aqi', { title: 'AQI', doc: doc });
+            });
         });
     }
 };
