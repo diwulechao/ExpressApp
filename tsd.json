@@ -31,6 +31,9 @@
     },
     "debug/debug.d.ts": {
       "commit": "e5de5c4daf8cdc33ed60704cd6e8021c99a89f92"
+    },
+    "mongodb/mongodb.d.ts": {
+      "commit": "e5de5c4daf8cdc33ed60704cd6e8021c99a89f92"
     }
   }
 }

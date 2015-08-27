@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var mongodbinit = require('./modules/mongodbinit.js');
+var weatherquery = require('./modules/weatherquery.js');
 
 var app = express();
 
@@ -26,8 +28,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-app.use('/generate_204', function (req, res){
+// generate 204 for android 5.0
+app.use('/generate_204', function (req, res) {
     res.sendStatus(204);
+});
+
+app.use('/trigger', function (req, res, next) {
+    weatherquery.trigger(req, res);
+});
+
+app.use('/query', function (req, res, next) {
+    weatherquery.query(req, res);
 });
 
 // catch 404 and forward to error handler

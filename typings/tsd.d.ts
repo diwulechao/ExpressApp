@@ -7,3 +7,4 @@
 /// <reference path="serve-favicon/serve-favicon.d.ts" />
 /// <reference path="stylus/stylus.d.ts" />
 /// <reference path="debug/debug.d.ts" />
+/// <reference path="mongodb/mongodb.d.ts" />
