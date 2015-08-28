@@ -40,6 +40,12 @@
     },
     "form-data/form-data.d.ts": {
       "commit": "e5de5c4daf8cdc33ed60704cd6e8021c99a89f92"
+    },
+    "moment/moment.d.ts": {
+      "commit": "8efeb01304406a7ef0b49e449630e1bfaefe52ba"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "8efeb01304406a7ef0b49e449630e1bfaefe52ba"
     }
   }
 }

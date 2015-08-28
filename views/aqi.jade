@@ -2,6 +2,7 @@ extends layout
 
 block content
     .page-header
-        h2 AQI
-    p #{doc.str}
-    p #{doc.time}
+        h1 AQI
+    h1 #{doc.str}
+    h1 pagetime = #{doc.pagetime}
+    h1 server fetch time = #{doc.time}
