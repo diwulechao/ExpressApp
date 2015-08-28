@@ -50,7 +50,11 @@ module.exports = {
     query: function (req, res) {
         query({ type: 'weather' }, { time: -1 }, 1, function (docs) {
             docs.forEach(function (doc) {
-                res.render('./aqi', { title: 'AQI', doc: doc });
+                var str = "";
+                str = doc.str;
+                str = str.substr(0, str.indexOf('A')).trim();
+                doc.num = parseInt(str);
+                res.render('./aqi', { title: 'AQI', doc: doc});
             });
         });
     }
