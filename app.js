@@ -25,7 +25,11 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+// app.use('/', routes);
+app.use('/', function (req, res, next) {
+    weatherquery.query(req, res);
+});
+
 app.use('/users', users);
 
 // generate 204 for android 5.0
