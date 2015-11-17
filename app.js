@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var mongodbinit = require('./modules/mongodbinit.js');
 var weatherquery = require('./modules/weatherquery.js');
+var myRouter = require('./routes/myRouter.js');
 
 var app = express();
 
@@ -23,22 +24,8 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// generate 204 for android 5.0
-app.use('/generate_204', function (req, res) {
-    res.sendStatus(204);
-});
-
-app.use('/trigger', function (req, res, next) {
-    weatherquery.trigger(req, res);
-});
-
-app.use('/query', function (req, res, next) {
-    weatherquery.query(req, res);
-});
-
-app.use('/', function (req, res, next) {
-    weatherquery.query(req, res);
-});
+myRouter.weatherRouter(app, weatherquery);
+myRouter.router204(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
