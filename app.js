@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
 var mongodbinit = require('./modules/mongodbinit.js');
 var weatherquery = require('./modules/weatherquery.js');
 
@@ -25,8 +23,6 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/users', users);
-
 // generate 204 for android 5.0
 app.use('/generate_204', function (req, res) {
     res.sendStatus(204);
@@ -40,7 +36,6 @@ app.use('/query', function (req, res, next) {
     weatherquery.query(req, res);
 });
 
-// app.use('/', routes);
 app.use('/', function (req, res, next) {
     weatherquery.query(req, res);
 });
