@@ -39,12 +39,16 @@ module.exports = {
     query: function (req, res) {
         var data = [];
         var labels = [];
-        query({}, { time: 1 }, 100, function (docs) {
+        query({}, { time: 1 }, 97, function (docs) {
             docs.forEach(function (doc) {
                 data.push(Math.round(doc.score * 100) / 100);
                 var day = moment(new Date(parseInt(doc.time)));
                 labels.push(day.utcOffset("+08:00").format("HH:mm"));
             });
+
+            for (var i = 0; i < labels.length - 1; i++) {
+                if (i % 4 > 0) labels[i] = '';
+            }
 
             res.render('./hl', { doc: { 'data': data, 'labels': JSON.stringify(labels) }, title: '红岭创投净值标利率曲线' });
         });
