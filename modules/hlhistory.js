@@ -4,15 +4,15 @@ var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
 var moment = require('moment');
 
-function insert(data, callback) {
-    var collection = mongodbinit.getDb().collection('c2');
+function insert(col, data, callback) {
+    var collection = mongodbinit.getDb().collection(col);
     collection.insert(data, function (err, result) {
         callback(result);
     });
 };
 
-function query(data, sort, limit, callback) {
-    var collection = mongodbinit.getDb().collection('c2');
+function query(col, data, sort, limit, callback) {
+    var collection = mongodbinit.getDb().collection(col);
     collection.find(data).sort(sort).limit(limit).toArray(function (err, result) {
         callback(result);
     });
@@ -25,13 +25,19 @@ module.exports = {
                 var doc = new dom().parseFromString(body);
                 var nodes = xpath.select("//dd[@class='dd_2 mar_top_18']/span/text()", doc);
                 var sum = 0;
+                var cnt = 0;
                 for (var i = 0; i < nodes.length; i++) {
-                    sum += parseFloat(nodes[i].toString());
+                    var val = parseFloat(nodes[i].toString());
+                    if (val <= 15 && val >= 7) {
+                        sum += val;
+                        cnt++;
+                    }
                 }
 
-                insert({ time: new Date().getTime(), score: sum / nodes.length }, function (result) {
-                    console.log(sum / nodes.length);
-                });
+                if (cnt > 0)
+                    insert('c2', { time: new Date().getTime(), score: sum / cnt }, function (result) {
+                        console.log(sum / cnt);
+                    });
             }
         });
     },
@@ -39,7 +45,7 @@ module.exports = {
     query: function (req, res) {
         var data = [];
         var labels = [];
-        query({}, { time: 1 }, 97, function (docs) {
+        query('c2', {}, { time: 1 }, 97, function (docs) {
             docs.forEach(function (doc) {
                 data.push(Math.round(doc.score * 100) / 100);
                 var day = moment(new Date(parseInt(doc.time)));
