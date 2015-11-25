@@ -35,9 +35,6 @@
     "mongodb/mongodb.d.ts": {
       "commit": "e5de5c4daf8cdc33ed60704cd6e8021c99a89f92"
     },
-    "request/request.d.ts": {
-      "commit": "b2d17b5dad042e293e77d09f2a30d281325cb606"
-    },
     "form-data/form-data.d.ts": {
       "commit": "b2d17b5dad042e293e77d09f2a30d281325cb606"
     },
@@ -46,6 +43,9 @@
     },
     "moment/moment-node.d.ts": {
       "commit": "8efeb01304406a7ef0b49e449630e1bfaefe52ba"
+    },
+    "xpath/xpath.d.ts": {
+      "commit": "b2d17b5dad042e293e77d09f2a30d281325cb606"
     }
   }
 }

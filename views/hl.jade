@@ -1,0 +1,15 @@
+extends layout
+
+block content
+
+    script(src="https://cdnjs.com/libraries/chart.js")
+    .page-header
+        h1 AQI
+    if doc.num < 50 
+        h1(style='color:green;font-size:38px;') #{doc.str}
+    else if doc.num < 100
+        h1(style='color:orange;font-size:38px;') #{doc.str}
+    else 
+        h1(style='color:red;font-size:38px;') #{doc.str}
+    h1 pagetime = #{doc.pagetime}
+    h1 server fetch time = #{doc.time}

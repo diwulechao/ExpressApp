@@ -1,4 +1,5 @@
 var mongodbinit = require('./mongodbinit.js');
+var hlHistory = require('./hlhistory.js');
 var request = require('request');
 var moment = require('moment');
 
@@ -38,7 +39,9 @@ module.exports = {
                     });
                 });
             }
-        })
+        });
+
+        hlHistory.trigger();
     },
 
     remove: function (req, res) {
@@ -54,7 +57,7 @@ module.exports = {
                 str = doc.str;
                 str = str.substr(0, str.indexOf('A')).trim();
                 doc.num = parseInt(str);
-                res.render('./aqi', { title: 'AQI', doc: doc});
+                res.render('./aqi', { title: 'AQI', doc: doc });
             });
         });
     }

@@ -21,11 +21,7 @@ myRouter.weatherRouter = function (app, weatherquery) {
 }
 
 myRouter.hlRouter = function (app, hlquery) {
-	app.use('/hl/trigger', function (req, res, next) {
-		hlquery.trigger(req, res);
-	});
-
-	app.use('/hl/query', function (req, res, next) {
+	app.use('/hl', function (req, res, next) {
 		hlquery.query(req, res);
 	});
 }
