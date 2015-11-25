@@ -11,8 +11,8 @@ block content
     canvas(id='myChart', max-width='1000px', height = '400px')
     
     h2 日K线
-    // canvas(id='myChart2', max-width='1000px', height = '400px')
-    p 还在写，10天后开放（数据需要一定的积累过程）
+    canvas(id='myChart2', max-width='1000px', height = '400px')
+    p 日K线数据需要一定的积累过程
     
     br
 
@@ -72,7 +72,7 @@ block content
             canvas.height = canvas.offsetHeight;
 
             var data = {
-                labels: JSON.parse('!{doc.labels}'),
+                labels: JSON.parse('!{doc.labels2}'),
                 datasets: [
                     {
                         label: "My First dataset",
@@ -82,7 +82,7 @@ block content
                         pointStrokeColor: "#fff",
                         pointHighlightFill: "#fff",
                         pointHighlightStroke: "rgba(151,187,205,1)",
-                        data: [#{doc.data}]
+                        data: [#{doc.data2}]
                     }
                 ]
             };

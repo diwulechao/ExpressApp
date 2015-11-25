@@ -46,6 +46,9 @@
     },
     "xpath/xpath.d.ts": {
       "commit": "b2d17b5dad042e293e77d09f2a30d281325cb606"
+    },
+    "async/async.d.ts": {
+      "commit": "b2d17b5dad042e293e77d09f2a30d281325cb606"
     }
   }
 }
