@@ -9,9 +9,15 @@ block content
         h1 红岭创投净值标利率曲线
     h2 24小时曲线
     canvas(id='myChart', max-width='1000px', height = '400px')
+    
+    h2 日K线
+    // canvas(id='myChart2', max-width='1000px', height = '400px')
+    p 还在写，10天后开放（数据需要一定的积累过程）
+    
+    br
 
     script.
-        $( document ).ready(function() {
+        function f1() {
             var canvas = document.getElementById("myChart");
             canvas.style.width ='100%';
             canvas.style.height='100%';
@@ -53,14 +59,62 @@ block content
                 legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
             };
             
-            var ctx = document.getElementById("myChart").getContext("2d");
+            var ctx = canvas.getContext("2d");
             var myLineChart = new Chart(ctx).Line(data, options);
+        };
+        
+        function f2() {
+            var canvas = document.getElementById("myChart2");
+            canvas.style.width ='100%';
+            canvas.style.height='100%';
+  
+            canvas.width  = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            var data = {
+                labels: JSON.parse('!{doc.labels}'),
+                datasets: [
+                    {
+                        label: "My First dataset",
+                        fillColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(151,187,205,1)",
+                        data: [#{doc.data}]
+                    }
+                ]
+            };
+            
+            var options = {
+                scaleShowGridLines : true,
+                scaleGridLineColor : "rgba(0,0,0,.05)",
+                scaleGridLineWidth : 1,
+                scaleShowHorizontalLines: true,
+                scaleShowVerticalLines: true,
+                bezierCurve : true,
+                bezierCurveTension : 0.4,
+                pointDot : true,
+                pointDotRadius : 4,
+                pointDotStrokeWidth : 1,
+                pointHitDetectionRadius : 20,
+                datasetStroke : true,
+                datasetStrokeWidth : 2,
+                datasetFill : true,
+                legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+            };
+            
+            var ctx = canvas.getContext("2d");
+            var myLineChart = new Chart(ctx).Line(data, options);
+        }
+    
+        $( document ).ready(function() {
+            f1();
+            f2();
         });
 
     p 作者id: diwulechao2
     p email: diwulechao@163.com
     p 欢迎大家提意见，非营利网页，请黑客同行手下留情。
-
-
-    
-
+    p 取样间隔15分钟，取样方法为1月净值标利率最高10标之平均值
