@@ -43,7 +43,7 @@ module.exports = {
             docs.forEach(function (doc) {
                 data.push(doc.score);
                 var day = moment(new Date(parseInt(doc.time)));
-                labels.push(day.format("HH:mm"));
+                labels.push(day.utcOffset("+08:00").format("HH:mm"));
             });
             
             res.render('./hl', { doc: { 'data': data, 'labels': JSON.stringify(labels) } });
