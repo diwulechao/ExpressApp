@@ -26,19 +26,33 @@ module.exports = {
             if (!error && response.statusCode == 200) {
                 var doc = new dom().parseFromString(body);
                 var nodes = xpath.select("//dd[@class='dd_2 mar_top_18']/span/text()", doc);
-                var sum = 0;
-                var cnt = 0;
+
+                var array = [];
                 for (var i = 0; i < nodes.length; i++) {
                     var val = parseFloat(nodes[i].toString());
                     if (val <= 15 && val >= 7) {
-                        sum += val;
-                        cnt++;
+                        array.push(val);
                     }
                 }
 
-                if (cnt > 0)
-                    insert('c2', { time: new Date().getTime(), score: sum / cnt }, function (result) {
-                    });
+                var min = 16.0, max = 5.0, sum = 0, result = 0;
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i] > max) max = array[i];
+                    if (array[i] < min) min = array[i];
+                    sum += array[i];
+                }
+                
+                if (array.length > 0) {
+                    if (array.length>=3) {
+                        result = (sum-min-max)/(array.length-2);
+                    }
+                    else {
+                        result = sum/array.length;
+                    }
+                    
+                    insert('c2', { time: new Date().getTime(), score: result }, function (result) {});
+                }
+                    
             }
         });
 
