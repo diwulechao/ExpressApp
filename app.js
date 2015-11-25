@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var hlHistory = require('./modules/hlhistory.js');
 
 var mongodbinit = require('./modules/mongodbinit.js');
 var weatherquery = require('./modules/weatherquery.js');
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+myRouter.hlRouter(app, hlHistory);
 myRouter.weatherRouter(app, weatherquery);
 myRouter.router204(app);
 
