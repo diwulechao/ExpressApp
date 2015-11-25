@@ -2,6 +2,7 @@ var mongodbinit = require('./mongodbinit.js');
 var request = require('request');
 var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
+var moment = require('moment');
 
 function insert(data, callback) {
     var collection = mongodbinit.getDb().collection('c2');
@@ -36,6 +37,16 @@ module.exports = {
     },
 
     query: function (req, res) {
-        res.render('./hl', { doc: { 'str': '1', 'pagetime': '2', 'time': '3' } });
+        var data = [];
+        var labels = [];
+        query({}, { time: 1 }, 100, function (docs) {
+            docs.forEach(function (doc) {
+                data.push(doc.score);
+                var day = moment(new Date(parseInt(doc.time)));
+                labels.push(day.format("HH:mm"));
+            });
+            
+            res.render('./hl', { doc: { 'data': data, 'labels': JSON.stringify(labels) } });
+        });
     }
 };
