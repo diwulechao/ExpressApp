@@ -83,7 +83,7 @@ module.exports = {
             function (callback) {
                 var data = [];
                 var labels = [];
-                query('c2', {}, { time: 1 }, 97, function (docs) {
+                query('c2', {}, { time: -1 }, 97, function (docs) {
                     docs.forEach(function (doc) {
                         data.push(Math.round(doc.score * 100) / 100);
                         var day = moment(new Date(parseInt(doc.time)));
@@ -94,8 +94,8 @@ module.exports = {
                         if (i % 4 > 0) labels[i] = '';
                     }
 
-                    dataSet.data1.data = data;
-                    dataSet.data1.labels = labels;
+                    dataSet.data1.data = data.reverse();
+                    dataSet.data1.labels = labels.reverse();
                     callback(null, null);
                 });
             },
@@ -103,7 +103,7 @@ module.exports = {
             function (callback) {
                 var data = [];
                 var labels = [];
-                query('c3', {}, { time: 1 }, 100, function (docs) {
+                query('c3', {}, { time: -1 }, 100, function (docs) {
                     docs.forEach(function (doc) {
                         data.push(Math.round(doc.score * 100) / 100);
                         labels.push(doc.date);
@@ -113,8 +113,8 @@ module.exports = {
                     //     if (i % 4 > 0) labels[i] = '';
                     // }
 
-                    dataSet.data2.data = data;
-                    dataSet.data2.labels = labels;
+                    dataSet.data2.data = data.reverse();
+                    dataSet.data2.labels = labels.reverse();
                     callback(null, null);
                 });
             }
