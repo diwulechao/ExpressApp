@@ -60,7 +60,7 @@ module.exports = {
         var date = moment().utcOffset("+08:00").add(-1, 'days').format("YYYY-MM-DD");
         query('c3', { 'date': date }, {}, 1, function (result) {
             if (result == null || result.length == 0) {
-                query('c2', {}, { time: 1 }, 96, function (docs) {
+                query('c2', {}, { time: -1 }, 96, function (docs) {
                     var cnt = 0;
                     var sum = 0;
                     docs.forEach(function (doc) {
