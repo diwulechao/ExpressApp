@@ -103,7 +103,7 @@ module.exports = {
             function (callback) {
                 var data = [];
                 var labels = [];
-                query('c3', {}, { time: -1 }, 100, function (docs) {
+                query('c3', {}, { 'date': -1 }, 100, function (docs) {
                     docs.forEach(function (doc) {
                         data.push(Math.round(doc.score * 100) / 100);
                         labels.push(doc.date);
