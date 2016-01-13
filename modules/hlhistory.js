@@ -109,9 +109,9 @@ module.exports = {
                         labels.push(doc.date);
                     });
 
-                    // for (var i = 0; i < labels.length - 1; i++) {
-                    //     if (i % 4 > 0) labels[i] = '';
-                    // }
+                    for (var i = 0; i < labels.length - 1; i++) {
+                        if (i % 2 > 0) labels[i] = '';
+                    }
 
                     dataSet.data2.data = data.reverse();
                     dataSet.data2.labels = labels.reverse();
