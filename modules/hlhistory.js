@@ -19,7 +19,50 @@ function query(col, data, sort, limit, callback) {
     });
 };
 
+function round(num) {
+    return Math.round(num * 100) / 100;
+}
+
+function daihuan() {
+    request('http://p2pfy.com/user.do?method=getbigDate', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var doc = new dom().parseFromString(body);
+            var nodes = xpath.select("//tr//td/text()", doc);
+            var ret = [];
+
+            nodes.forEach(function (doc) {
+                var s = doc.toString();
+                if (s != null && s.length > 1) {
+                    if (s.length == 10 && s.charAt(0) == '2' && s.charAt(4) == '-' && s.charAt(7) == '-') {
+                        //this is a date
+                        ret.push({ 'date': s, value: 0 });
+                    }
+                    else if (s.length >= 4 && s.indexOf("计算") == -1 && s.charAt(s.length - 1) == '万') {
+                        //this is a number
+                        var num = parseInt(s);
+                        if (!isNaN(num)) {
+                            if (ret.length > 0 && ret[ret.length - 1].value < num) {
+                                ret[ret.length - 1].value = num;
+                            }
+                        }
+                    }
+                }
+            });
+
+            ret.forEach(function (doc) {
+                if (doc.value >= 10000) {
+                    insert('c4', { date: doc.date, value: doc.value }, function (result) { });
+                }
+            });
+        }
+    });
+}
+
 module.exports = {
+    test: function() {
+        daihuan();
+    },
+
     trigger: function () {
         // 24 hours
         request('https://www.my089.com/Loan/default.aspx?&ou=1&mit=1&oc=3&mat=1', function (error, response, body) {
@@ -68,17 +111,15 @@ module.exports = {
                     var max = 0, min = 100, start = 0, end = 0;
 
                     docs.forEach(function (doc) {
-                        if (doc.time >= startTimestamp && doc.time <= endTimestamp) {
-                            if (min > doc.score) min = doc.score;
-                            if (max < doc.score) max = doc.score;
-                            if (firstPoint > doc.time) {
-                                firstPoint = doc.time;
-                                start = doc.score;
-                            }
-                            if (lastPoint < doc.time) {
-                                lastPoint = doc.time;
-                                end = doc.score;
-                            }
+                        if (min > doc.score) min = doc.score;
+                        if (max < doc.score) max = doc.score;
+                        if (firstPoint > doc.time) {
+                            firstPoint = doc.time;
+                            start = doc.score;
+                        }
+                        if (lastPoint < doc.time) {
+                            lastPoint = doc.time;
+                            end = doc.score;
                         }
                     });
 
@@ -86,10 +127,14 @@ module.exports = {
                 });
             }
         });
+        
+        if (moment().utcOffset("+08:00").hour() == 8) {
+            daihuan();
+        }
     },
 
     query: function (req, res) {
-        var dataSet = { 'data1': {}, 'data2': {} };
+        var dataSet = { 'data1': {}, 'data2': {}, 'data3':{} };
 
         async.parallel([
             function (callback) {
@@ -97,12 +142,12 @@ module.exports = {
                 query('c2', {}, { time: -1 }, 97, function (docs) {
                     docs.forEach(function (doc) {
                         var point = {};
-                        point.y = Math.round(doc.score * 100) / 100;
+                        point.y = round(doc.score);
                         point.x = new Date(parseInt(doc.time));
                         data.push(point);
                     });
 
-                    dataSet.data1.data = data.reverse();
+                    dataSet.data1 = data.reverse();
                     callback(null, null);
                 });
             },
@@ -112,21 +157,38 @@ module.exports = {
                 query('c3', {}, { 'date': -1 }, 100, function (docs) {
                     docs.forEach(function (doc) {
                         var point = {};
-                        point.y = [doc.start,doc.max,doc.min,doc.end];
+                        point.y = [round(doc.start), round(doc.max), round(doc.min), round(doc.end)];
                         point.x = doc.date
                         data.push(point);
                     });
 
-                    dataSet.data2.data = data.reverse();
+                    dataSet.data2 = data.reverse();
+                    callback(null, null);
+                });
+            },
+            
+            function (callback) {
+                var data = [];
+                query('c4', {}, { 'date': -1 }, 100, function (docs) {
+                    docs.forEach(function (doc) {
+                        var point = {};
+                        point.y = doc.value / 1000;
+                        point.x = doc.date
+                        data.push(point);
+                    });
+
+                    dataSet.data3 = data.reverse();
                     callback(null, null);
                 });
             }
         ],
 
         function (error, results) {
-            res.render('./hl', { doc: { 
-                'data': dataSet.data1.data, 
-                'data2': dataSet.data2.data }, title: '红岭创投净值标利率曲线' });
+            res.render('./hl', { title: '红岭创投净值标利率曲线', doc: { 
+                'data': dataSet.data1, 
+                'data2': dataSet.data2, 
+                'data3': dataSet.data3
+                }});
             }
         );
     }

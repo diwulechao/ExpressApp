@@ -14,8 +14,8 @@ block content
     div(id='chartContainer', style='height:400px; width:100%' )
     
     div(id='chartContainer2', style='height:400px; width:100%' )
-    p 日K线数据需要一定的积累过程
-    
+    p 灰色虚线为待还，单位千万
+
     br
 
     script.
@@ -33,12 +33,14 @@ block content
                     doc.indexLabel = "最高";
                     doc.markerColor = "red";
                     doc.markerType = "triangle";
+                    max = 99999;
                 }
                 
                 if (min == doc.y) {
                     doc.indexLabel = "最低";
                     doc.markerColor = "DarkSlateGrey";
                     doc.markerType = "cross";
+                    min = 999999;
                 }
             });
 
@@ -56,14 +58,16 @@ block content
                         valueFormatString: "HH:mm",
                         interval: 90,
                         intervalType: "minute"
-
                     },
-                    axisY: {
-                        includeZero: false
+                    axisY2: {
+                        includeZero: false,
+                        title:"利率"
                     },
                     data: [
                         {
-                            type: "line",
+                            type: "area",
+                            axisYType: "secondary",
+                            fillOpacity: .3,
                             dataPoints: dPoints
                         }
                     ]
@@ -75,8 +79,13 @@ block content
         
         function f2() {
             var dPoints = !{ JSON.stringify(doc.data2) };
+            var dPoints3 = !{ JSON.stringify(doc.data3) };
             dPoints.forEach(function (doc) {
                doc.x = new Date(doc.x);
+            });
+            
+            dPoints3.forEach(function (doc) {
+                doc.x = new Date(doc.x);
             });
             
             var chart = new CanvasJS.Chart("chartContainer2",
@@ -94,23 +103,39 @@ block content
                         interval: 1,
                         intervalType: "week"
                     },
+                    axisY2: {
+                        includeZero: false,
+                        title: "利率"
+                    },
                     axisY: {
-                        includeZero: false
+                        includeZero: false,
+                        minimum: 10,
+                        maximum: 40,
+                        gridColor: "#111111",
+                        gridThickness :0,
+                        title: "待还(千万)"
                     },
                     data: [
                         {
                             type: "candlestick",
                             risingColor: "#F54545",
                             color:"#0F990F",
+                            axisYType: "secondary",
                             dataPoints: dPoints
-                        }
+                        },
+                        {
+                            type: "line",
+                            color:"#AAAAAA",
+                            lineDashType: "dash",
+                            dataPoints: dPoints3
+                        },
                     ]
                 }
                 );
 
             chart.render();
         };
-        
+
         $( document ).ready(function() {
             f1();
             f2();
@@ -119,4 +144,3 @@ block content
     p 欢迎大家提意见
     p 作者id: diwulechao2
     p email: diwulechao@163.com
-    p 取样间隔15分钟，取样方法为1月净值标利率最高10标之平均值
