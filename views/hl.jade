@@ -6,119 +6,117 @@ block content
         body {  padding: 50px;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
         a { color: #00b7ff;}
         
-    script(src='http://cdn.bootcss.com/Chart.js/1.0.2/Chart.min.js')
     script(src='http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js')
+    script(src='http://cdn.bootcss.com/canvasjs/1.7.0/canvasjs.min.js')
 
     .page-header
         h1 红岭创投净值标利率曲线
-    h2 24小时曲线
-    canvas(id='myChart', max-width='1000px', height = '400px')
+    div(id='chartContainer', style='height:400px; width:100%' )
     
-    h2 日K线
-    canvas(id='myChart2', max-width='1000px', height = '400px')
+    div(id='chartContainer2', style='height:400px; width:100%' )
     p 日K线数据需要一定的积累过程
     
     br
 
     script.
         function f1() {
-            var canvas = document.getElementById("myChart");
-            canvas.style.width ='100%';
-            canvas.style.height='100%';
-  
-            canvas.width  = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            var dPoints = !{ JSON.stringify(doc.data) };
+            var max=0,min=100;
+            dPoints.forEach(function (doc) {
+                doc.x = new Date(doc.x);
+                if (max<doc.y) max=doc.y;
+                if (min>doc.y) min=doc.y;
+            });
+            
+            dPoints.forEach(function (doc) {
+                if (max == doc.y) {
+                    doc.indexLabel = "最高";
+                    doc.markerColor = "red";
+                    doc.markerType = "triangle";
+                }
+                
+                if (min == doc.y) {
+                    doc.indexLabel = "最低";
+                    doc.markerColor = "DarkSlateGrey";
+                    doc.markerType = "cross";
+                }
+            });
 
-            var data = {
-                labels: JSON.parse('!{doc.labels}'),
-                datasets: [
-                    {
-                        label: "My First dataset",
-                        fillColor: "rgba(151,187,205,0.2)",
-                        strokeColor: "rgba(151,187,205,1)",
-                        pointColor: "rgba(151,187,205,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(151,187,205,1)",
-                        data: [#{doc.data}]
-                    }
-                ]
-            };
-            
-            var options = {
-                scaleShowGridLines : true,
-                scaleGridLineColor : "rgba(0,0,0,.05)",
-                scaleGridLineWidth : 1,
-                scaleShowHorizontalLines: true,
-                scaleShowVerticalLines: true,
-                bezierCurve : true,
-                bezierCurveTension : 0.4,
-                pointDot : true,
-                pointDotRadius : 4,
-                pointDotStrokeWidth : 1,
-                pointHitDetectionRadius : 1,
-                datasetStroke : true,
-                datasetStrokeWidth : 2,
-                datasetFill : true,
-                legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-            };
-            
-            var ctx = canvas.getContext("2d");
-            var myLineChart = new Chart(ctx).Line(data, options);
+            var chart = new CanvasJS.Chart("chartContainer",
+                {
+                    theme: "theme2",
+                    title: {
+                        horizontalAlign: "left",
+                        margin : 20,
+                        text: "24小时曲线",
+                        fontSize : 23
+                    },
+                    animationEnabled: true,
+                    axisX: {
+                        valueFormatString: "HH:mm",
+                        interval: 90,
+                        intervalType: "minute"
+
+                    },
+                    axisY: {
+                        includeZero: false
+                    },
+                    data: [
+                        {
+                            type: "line",
+                            dataPoints: dPoints
+                        }
+                    ]
+                }
+                );
+
+            chart.render();
         };
         
         function f2() {
-            var canvas = document.getElementById("myChart2");
-            canvas.style.width ='100%';
-            canvas.style.height='100%';
-  
-            canvas.width  = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            var dPoints = !{ JSON.stringify(doc.data2) };
+            dPoints.forEach(function (doc) {
+               doc.x = new Date(doc.x);
+            });
+            
+            var chart = new CanvasJS.Chart("chartContainer2",
+                {
+                    theme: "theme2",
+                    title: {
+                        horizontalAlign: "left",
+                        margin : 20,
+                        text: "日K线",
+                        fontSize : 23
+                    },
+                    animationEnabled: true,
+                    axisX: {
+                        valueFormatString: "YYYY-MM-DD",
+                        interval: 1,
+                        intervalType: "week"
+                    },
+                    axisY: {
+                        includeZero: false
+                    },
+                    data: [
+                        {
+                            type: "candlestick",
+                            risingColor: "#F54545",
+                            color:"#0F990F",
+                            dataPoints: dPoints
+                        }
+                    ]
+                }
+                );
 
-            var data = {
-                labels: JSON.parse('!{doc.labels2}'),
-                datasets: [
-                    {
-                        label: "My First dataset",
-                        fillColor: "rgba(151,187,205,0.2)",
-                        strokeColor: "rgba(151,187,205,1)",
-                        pointColor: "rgba(151,187,205,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(151,187,205,1)",
-                        data: [#{doc.data2}]
-                    }
-                ]
-            };
-            
-            var options = {
-                scaleShowGridLines : true,
-                scaleGridLineColor : "rgba(0,0,0,.05)",
-                scaleGridLineWidth : 1,
-                scaleShowHorizontalLines: true,
-                scaleShowVerticalLines: true,
-                bezierCurve : true,
-                bezierCurveTension : 0.4,
-                pointDot : true,
-                pointDotRadius : 4,
-                pointDotStrokeWidth : 1,
-                pointHitDetectionRadius : 1,
-                datasetStroke : true,
-                datasetStrokeWidth : 2,
-                datasetFill : true,
-                legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-            };
-            
-            var ctx = canvas.getContext("2d");
-            var myLineChart = new Chart(ctx).Line(data, options);
-        }
-    
+            chart.render();
+        };
+        
         $( document ).ready(function() {
             f1();
             f2();
         });
 
+    p 欢迎大家提意见
     p 作者id: diwulechao2
     p email: diwulechao@163.com
-    p 欢迎大家提意见，非营利网页，请黑客同行手下留情。
     p 取样间隔15分钟，取样方法为1月净值标利率最高10标之平均值

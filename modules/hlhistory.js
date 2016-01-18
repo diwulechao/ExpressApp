@@ -82,39 +82,30 @@ module.exports = {
         async.parallel([
             function (callback) {
                 var data = [];
-                var labels = [];
                 query('c2', {}, { time: -1 }, 97, function (docs) {
                     docs.forEach(function (doc) {
-                        data.push(Math.round(doc.score * 100) / 100);
-                        var day = moment(new Date(parseInt(doc.time)));
-                        labels.push(day.utcOffset("+08:00").format("HH:mm"));
+                        var point = {};
+                        point.y = Math.round(doc.score * 100) / 100;
+                        point.x = new Date(parseInt(doc.time));
+                        data.push(point);
                     });
 
-                    for (var i = 0; i < labels.length - 1; i++) {
-                        if (i % 4 > 0) labels[i] = '';
-                    }
-
                     dataSet.data1.data = data.reverse();
-                    dataSet.data1.labels = labels.reverse();
                     callback(null, null);
                 });
             },
 
             function (callback) {
                 var data = [];
-                var labels = [];
                 query('c3', {}, { 'date': -1 }, 100, function (docs) {
                     docs.forEach(function (doc) {
-                        data.push(Math.round(doc.score * 100) / 100);
-                        labels.push(doc.date);
+                        var point = {};
+                        point.y = [doc.start,doc.max,doc.min,doc.end];
+                        point.x = doc.date
+                        data.push(point);
                     });
 
-                    for (var i = 0; i < labels.length - 1; i++) {
-                        if (i % 2 > 0) labels[i] = '';
-                    }
-
                     dataSet.data2.data = data.reverse();
-                    dataSet.data2.labels = labels.reverse();
                     callback(null, null);
                 });
             }
@@ -123,9 +114,7 @@ module.exports = {
         function (error, results) {
             res.render('./hl', { doc: { 
                 'data': dataSet.data1.data, 
-                'labels': JSON.stringify(dataSet.data1.labels), 
-                'data2': dataSet.data2.data, 
-                'labels2': JSON.stringify(dataSet.data2.labels) }, title: '红岭创投净值标利率曲线' });
+                'data2': dataSet.data2.data }, title: '红岭创投净值标利率曲线' });
             }
         );
     }
