@@ -60,17 +60,29 @@ module.exports = {
         var date = moment().utcOffset("+08:00").add(-1, 'days').format("YYYY-MM-DD");
         query('c3', { 'date': date }, {}, 1, function (result) {
             if (result == null || result.length == 0) {
-                query('c2', {}, { time: -1 }, 96, function (docs) {
-                    var cnt = 0;
-                    var sum = 0;
+                var startTimestamp = parseInt(moment().utcOffset("+08:00").add(-1, 'days').hour(0).minute(0).second(0).format('x'));
+                var endTimestamp = parseInt(moment().utcOffset("+08:00").add(-1, 'days').hour(23).minute(59).second(59).format('x'));
+                    
+                query('c2', { time: { $gt: startTimestamp, $lt: endTimestamp } }, {}, 200, function (docs) {
+                    var firstPoint = 2448427377023, lastPoint = 0;
+                    var max = 0, min = 100, start = 0, end = 0;
+
                     docs.forEach(function (doc) {
-                        sum += Math.round(doc.score * 100) / 100;
-                        cnt++;
+                        if (doc.time >= startTimestamp && doc.time <= endTimestamp) {
+                            if (min > doc.score) min = doc.score;
+                            if (max < doc.score) max = doc.score;
+                            if (firstPoint > doc.time) {
+                                firstPoint = doc.time;
+                                start = doc.score;
+                            }
+                            if (lastPoint < doc.time) {
+                                lastPoint = doc.time;
+                                end = doc.score;
+                            }
+                        }
                     });
 
-                    // avg for today
-                    var avg = sum / cnt;
-                    insert('c3', { 'score': avg, 'date': date }, function (result) { });
+                    insert('c3', { 'date': date,'min':min,'max':max,'start':start,'end':end }, function (result) { });
                 });
             }
         });
