@@ -59,10 +59,6 @@ function daihuan() {
 }
 
 module.exports = {
-    test: function() {
-        daihuan();
-    },
-
     trigger: function () {
         // 24 hours
         request('https://www.my089.com/Loan/default.aspx?&ou=1&mit=1&oc=3&mat=1', function (error, response, body) {

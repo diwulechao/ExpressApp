@@ -3,24 +3,40 @@ extends layout
 block content
 
     style.
-        body {  padding: 50px;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
-        a { color: #00b7ff;}
-        
-    script(src='http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js')
-    script(src='http://cdn.bootcss.com/canvasjs/1.7.0/canvasjs.min.js')
+      body {  padding: 50px;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+      a { color: #00b7ff;}
 
-    .page-header
-        h1 红岭创投净值标利率曲线
+    script(src='http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js')
+    script(src='http://cdn.bootcss.com/moment.js/2.11.1/moment.min.js')
+    script(src='http://cdn.bootcss.com/moment.js/2.11.1/locale/zh-cn.js')
+    script(src='http://cdn.bootcss.com/canvasjs/1.7.0/canvasjs.min.js')
+    script(src='http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js')
+    script(src='http://cdn.bootcss.com/bootstrap/3.2.0/js/transition.min.js')
+    script(src='http://cdn.bootcss.com/bootstrap/3.2.0/js/collapse.min.js')
+    script(src='http://cdn.bootcss.com/bootstrap-datetimepicker/4.15.35/js/bootstrap-datetimepicker.min.js')
+    link(rel="stylesheet",href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css")
+    link(rel="stylesheet",href="http://cdn.bootcss.com/bootstrap-datetimepicker/4.15.35/css/bootstrap-datetimepicker.min.css")
+
+    h1 红岭创投净值标利率曲线
+
+
     div(id='chartContainer', style='height:400px; width:100%' )
-    
+
+    .input-group.date(id='datetimepicker1',style='width:300px;float:left')
+      input.form-control(type='text')
+      span.input-group-addon
+        span.glyphicon.glyphicon-calendar
+    button.btn.btn-default(id='btn-c1-refresh',style='margin-left:20px;margin-bottom: 20px') 确定
+        
     div(id='chartContainer2', style='height:400px; width:100%' )
     p 灰色虚线为待还，单位千万
 
     br
 
     script.
-        function f1() {
+        function f1(data) {
             var dPoints = !{ JSON.stringify(doc.data) };
+            if (data!=null) dPoints=data;
             var max=0,min=100;
             dPoints.forEach(function (doc) {
                 doc.x = new Date(doc.x);
@@ -80,7 +96,7 @@ block content
 
             chart.render();
         };
-        
+
         function f2() {
             var dPoints = !{ JSON.stringify(doc.data2) };
             var dPoints3 = !{ JSON.stringify(doc.data3) };
@@ -89,7 +105,7 @@ block content
             if (interval<=1) interval = 1;
             
             dPoints.forEach(function (doc) {
-               doc.x = new Date(doc.x);
+            doc.x = new Date(doc.x);
             });
             
             dPoints3.forEach(function (doc) {
@@ -143,15 +159,38 @@ block content
 
             chart.render();
         };
-        
+
         function changeCredit() {
-            $( ".canvasjs-chart-credit" ).remove();
+            $( ".canvasjs-chart-credit" ).text('');
+        }
+
+        function datetimewidget() {
+            $('#datetimepicker1').datetimepicker({
+                defaultDate: new Date(),
+                sideBySide: true,
+                minDate: new Date(2015,10,25),
+                maxDate: new Date()
+            });
         }
 
         $( document ).ready(function() {
             f1();
             f2();
             changeCredit();
+            datetimewidget();
+        });
+        
+        window.addEventListener('resize', function(event){
+            changeCredit();
+        });
+        
+        $("#btn-c1-refresh").click(function(){
+            var time = $('#datetimepicker1').data("DateTimePicker").date().format('x');
+            $.ajax({
+                url:"./hl/data?type=1&time="+time
+            }).done(function(data){
+                f1(data);
+            });
         });
 
     p 欢迎大家提意见
