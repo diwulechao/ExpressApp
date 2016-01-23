@@ -27,6 +27,12 @@ app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (req, res, next) { 
+    res.removeHeader("X-Powered-By");
+    res.removeHeader("Server");
+    next(); 
+});
+
 myRouter.hlRouter(app, hlHistory);
 myRouter.weatherRouter(app, weatherquery);
 myRouter.router204(app);
