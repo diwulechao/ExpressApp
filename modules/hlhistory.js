@@ -12,6 +12,13 @@ function insert(col, data, callback) {
     });
 };
 
+function upsert(col, query,update, callback) {
+    var collection = mongodbinit.getDb().collection(col);
+    collection.updateOne(query,update,{upsert:true}, function(err,result) {
+        callback(result);
+    });
+};
+
 function query(col, data, sort, limit, callback) {
     var collection = mongodbinit.getDb().collection(col);
     collection.find(data).sort(sort).limit(limit).toArray(function (err, result) {
@@ -51,7 +58,7 @@ function daihuan() {
 
             ret.forEach(function (doc) {
                 if (doc.value >= 10000) {
-                    insert('c4', { date: doc.date, value: doc.value }, function (result) { });
+                    upsert('c4', {date:doc.date},{ date: doc.date, value: doc.value }, function (result) { });
                 }
             });
         }
@@ -59,6 +66,11 @@ function daihuan() {
 }
 
 module.exports = {
+    test: function(req,res) {
+        daihuan();
+        res.sendStatus(204);
+    }, 
+    
     trigger: function () {
         // 24 hours
         request('https://www.my089.com/Loan/default.aspx?&ou=1&mit=1&oc=3&mat=1', function (error, response, body) {

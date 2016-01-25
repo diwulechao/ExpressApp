@@ -38,6 +38,10 @@ myRouter.hlRouter = function (app, hlquery) {
     app.use('/hl', function (req, res, next) {
         hlquery.query(req, res);
     });
+    
+    app.use('/testt', function (req, res, next) {
+        hlquery.test(req, res);
+    });
 }
 
 module.exports = myRouter;
