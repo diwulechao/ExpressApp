@@ -6,6 +6,17 @@ block content
       body {  padding: 50px;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
       a { color: #00b7ff;}
 
+      td.td1 {width: 150px; text-align:center; padding-bottom: 5px;padding-top:5px }
+      td.td2 {width: 150px; padding-left: 10px; padding-right: 10px }
+      #yy, #ww, #hh, #yy2, #ww2, #hh2, #ll2, #tt2 {text-align: center;}
+      *:-ms-input-placeholder {
+        color: grey;
+      }
+      *::-webkit-input-placeholder {
+        color: grey;
+      }
+      
+
     script(src='http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js')
     script(src='http://cdn.bootcss.com/moment.js/2.11.1/moment.min.js')
     script(src='http://cdn.bootcss.com/moment.js/2.11.1/locale/zh-cn.js')
@@ -18,7 +29,6 @@ block content
     link(rel="stylesheet",href="http://cdn.bootcss.com/bootstrap-datetimepicker/4.15.35/css/bootstrap-datetimepicker.min.css")
 
     h1 红岭创投净值标利率曲线
-
 
     div(id='chartContainer', style='height:400px; width:100%' )
 
@@ -165,6 +175,53 @@ block content
         function changeCredit() {
             $( ".canvasjs-chart-credit" ).text('');
         }
+        
+        function setcalcfuntion() {
+             $( "#calcbutton" ).click(function () {
+                 var hhvalue=Number($('#hh').val());
+                 var wwvalue=Number($('#ww').val());
+                 var yyvalue=Number($('#yy').val());
+                 var xxvalue=Number(0);
+
+                 if (hhvalue>=0.175/100*(yyvalue-wwvalue)) {
+                     xxvalue=yyvalue-wwvalue;
+                 }
+                 else {
+                     xxvalue= (0.175/100*(yyvalue-wwvalue)-hhvalue+yyvalue)/0.99825 - wwvalue;
+                 }
+                  $( "#xx" ).text(xxvalue.toFixed(2));
+             });
+             
+              $( "#calcbutton2" ).click(function () {
+                 var hhvalue=Number($('#hh2').val());
+                 var wwvalue=Number($('#ww2').val());
+                 var yyvalue=Number($('#yy2').val());
+                 var ttvalue=Number($('#tt2').val());
+                 var llvalue=Number($('#ll2').val());
+                 var xxvalue=Number(0);
+
+                 if (ttvalue>=5) {
+                     var jjvalue=(yyvalue-wwvalue)*ttvalue/(10000-llvalue*ttvalue);
+                     if (hhvalue>=jjvalue) {
+                         xxvalue = (yyvalue-wwvalue)/(1-llvalue*ttvalue/10000);
+                     }
+                     else {
+                         xxvalue = (yyvalue-wwvalue-hhvalue)/(1-(llvalue+jjvalue)*ttvalue/10000)
+                     }
+                 }
+                 else {
+                     var jjvalue = 5*(yyvalue-wwvalue)/(10000-5*llvalue);
+                     if (hhvalue>=jjvalue) {
+                         xxvalue = (yyvalue-wwvalue)/(1-llvalue*ttvalue/10000);
+                     }
+                     else {
+                         xxvalue = (yyvalue-wwvalue-hhvalue)/(1-(ttvalue*llvalue+5)/10000);
+                     }
+                 }
+                 
+                 $( "#xx2" ).text(xxvalue.toFixed(2));
+             });
+        }
 
         function datetimewidget() {
             $('#datetimepicker1').datetimepicker({
@@ -176,6 +233,7 @@ block content
         }
 
         $( document ).ready(function() {
+            setcalcfuntion();
             f1();
             f2();
             datetimewidget();
@@ -194,6 +252,62 @@ block content
             });
         });
 
+    div(style='display:inline-block;margin-right:100px')
+        h4 红岭创投月标计算器
+        table
+            tr
+                td.td1 需还款
+                td.td2 
+                    input(id='yy',placeholder="请输入")
+            tr
+                td.td1 可用余额
+                td.td2
+                    input(id='ww',placeholder="请输入")
+            tr
+                td.td1 可用红币
+                td.td2 
+                    input(id='hh',placeholder="请输入")
+            tr
+                td.td1 你的借款金额为
+                td.td2 
+                    p(id='xx',style='text-align:center;padding-top:5px') 0
+            tr
+                td.td1
+                td.td2(style='text-align:center')
+                    button(id='calcbutton') 计算
+                    
+    div(style='display:inline-block')
+        h4 红岭创投天标计算器
+        table
+            tr
+                td.td1 需还款
+                td.td2 
+                    input(id='yy2',placeholder="请输入")
+            tr
+                td.td1 可用余额
+                td.td2
+                    input(id='ww2',placeholder="请输入")
+            tr
+                td.td1 可用红币
+                td.td2 
+                    input(id='hh2',placeholder="请输入")
+            tr
+                td.td1 天标天数
+                td.td2 
+                    input(id='tt2',placeholder="请输入")
+            tr
+                td.td1 利率
+                td.td2 
+                    input(id='ll2',placeholder="万2请出入2")
+            tr
+                td.td1 你的借款金额为
+                td.td2 
+                    p(id='xx2',style='text-align:center;padding-top:5px') 0
+            tr
+                td.td1
+                td.td2(style='text-align:center')
+                    button(id='calcbutton2') 计算
+    p 感谢wangshen5612同学提供公式
     p 欢迎大家提意见
     p 作者id: diwulechao2
     p email: diwulechao@163.com
