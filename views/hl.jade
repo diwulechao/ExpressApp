@@ -187,7 +187,7 @@ block content
                      xxvalue=yyvalue-wwvalue;
                  }
                  else {
-                     xxvalue= (0.175/100*(yyvalue-wwvalue)-hhvalue+yyvalue)/0.99825 - wwvalue;
+                     xxvalue= 0.175/100*(yyvalue-wwvalue)+yyvalue/0.99825-hhvalue-wwvalue; 
                  }
                   $( "#xx" ).text(xxvalue.toFixed(2));
              });
