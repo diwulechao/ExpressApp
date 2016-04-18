@@ -1,5 +1,6 @@
 var mongodbinit = require('../modules/mongodbinit.js');
 var moment = require('moment');
+var comment = require('../modules/comment.js');
 
 function insert(col, data, callback) {
     var collection = mongodbinit.getDb().collection(col);
@@ -41,5 +42,17 @@ module.exports = {
         var ret = 'world';
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(ret));
+    },
+    
+    insertComment: function (user, value, res) {
+        comment.insert(user,value);
+        res.sendStatus(204);
+    },
+    
+    queryComment: function (top, res) {
+        comment.query(top, function (result) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+        });
     }
 }

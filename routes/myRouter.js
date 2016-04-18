@@ -1,29 +1,29 @@
 var myRouter = {};
 var dataController = require('../controllers/dataController.js');
 
-myRouter.router204 = function (app) {
+myRouter.router204 = function(app) {
     // generate 204 for android 5.0
-    app.use('/generate_204', function (req, res) {
+    app.use('/generate_204', function(req, res) {
         res.sendStatus(204);
     });
 }
 
-myRouter.weatherRouter = function (app, weatherquery) {
-    app.use('/trigger', function (req, res, next) {
+myRouter.weatherRouter = function(app, weatherquery) {
+    app.use('/trigger', function(req, res, next) {
         weatherquery.trigger(req, res);
     });
 
-    app.use('/query', function (req, res, next) {
+    app.use('/query', function(req, res, next) {
         weatherquery.query(req, res);
     });
 
-    app.use('/', function (req, res, next) {
+    app.use('/', function(req, res, next) {
         weatherquery.query(req, res);
     });
 }
 
-myRouter.hlRouter = function (app, hlquery) {
-    app.use('/hl/data', function (req, res, next) {
+myRouter.hlRouter = function(app, hlquery) {
+    app.use('/hl/data', function(req, res, next) {
         if (req.query['type'] == 1) {
             dataController.getMinuteData(req.query['time'], res);
         }
@@ -34,12 +34,22 @@ myRouter.hlRouter = function (app, hlquery) {
             res.sendStatus(404);
         }
     });
-    
-    app.use('/hl', function (req, res, next) {
+
+    app.use('/hl/comment', function(req, res, next) {
+        if (req.query['type'] == 1) {
+            dataController.insertComment(req.body.user, req.body.comment, res);
+        }
+        else if (req.query['type'] == 2) {
+            dataController.queryComment(req.body.top, res);
+        }
+        else res.sendStatus(404);
+    });
+
+    app.use('/hl', function(req, res, next) {
         hlquery.query(req, res);
     });
-    
-    app.use('/testt', function (req, res, next) {
+
+    app.use('/testt', function(req, res, next) {
         hlquery.test(req, res);
     });
 }
