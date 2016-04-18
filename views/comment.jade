@@ -27,7 +27,6 @@ block content
                 var newnode='';
                 data.forEach(function(doc) {
                     newnode = newnode.concat('<p>'+doc.user+'</p><p>' + doc.comment + '</p><br>');
-                    
                 });
                 $('#maincontent').html(newnode);
             });
@@ -35,12 +34,22 @@ block content
         
         $( document ).ready(function() {
             whenpageloaded();
+            $('#submitcomment').click(function() {
+                $.ajax({
+                    url:"./comment?type=1",
+                    type:"POST",
+                    data: {
+                        comment:$('#commentinput').val(),
+                        user:$('#userinput').val()
+                    }
+                }).done(function(data){whenpageloaded();});
+            });
         });
 
     h1 留言板
     div
         textarea(id='commentinput',placeholder="请输入留言", style='width:100%;height:100px')
-        input(id='userinput',placeholder="用户名",style='width:100px;height:25px;margin-right:10px')
+        input(id='userinput',placeholder="用户名",style='width:100px;height:25px;margin-right:10px',type='text')
         button(id='submitcomment', style='width:50px;height:25px;margin-top: 10px') 提交
     div(id='maincontent',style='margin-top:50px')
     p(id='loadingtext')

@@ -11,7 +11,7 @@ function creatTable() {
     });
 };
 
-function insert(user, value) {
+function insert(user, value, cb) {
     var entGen = azure.TableUtilities.entityGenerator;
     var task = {
         PartitionKey: entGen.String('1'),
@@ -21,9 +21,7 @@ function insert(user, value) {
     };
 
     tableSvc.insertEntity('mytable', task, function (error, result, response) {
-        if (!error) {
-            // Entity inserted
-        }
+        cb();
     });
 };
 
@@ -38,12 +36,24 @@ function query(top, cb) {
             // parse result to hide info
             var ret = [];
             result.entries.forEach(function (doc) {
-                var tp = {
-                    user: doc.user['_'],
-                    comment: doc.comment['_'],
-                    timestamp: doc.Timestamp['_']
-                };
-                ret.push(tp);
+                try {
+                    var tp = {
+                        user: doc.user['_'],
+                        comment: doc.comment['_'],
+                        timestamp: doc.Timestamp['_']
+                    };
+
+                    if (tp.comment != null && tp.comment != '' && tp.comment.length <= 500) {
+                        if (tp.user == null || tp.user == '') {
+                            tp.user = '匿名用户'
+                        }
+
+                        if (tp.user.length <= 50)
+                            ret.push(tp);
+                    }
+
+                }
+                catch (e) { };
             });
             cb(ret);
         }
@@ -51,8 +61,8 @@ function query(top, cb) {
 }
 
 module.exports = {
-    insert: function (user, value) {
-        insert(user, value);
+    insert: function (user, value, cb) {
+        insert(user, value, cb);
     },
 
     query: function (top, cb) {

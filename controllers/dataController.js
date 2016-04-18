@@ -45,8 +45,9 @@ module.exports = {
     },
     
     insertComment: function (user, value, res) {
-        comment.insert(user,value);
-        res.sendStatus(204);
+        comment.insert(user,value, function () {
+            res.sendStatus(204);
+        });
     },
     
     queryComment: function (top, res) {
