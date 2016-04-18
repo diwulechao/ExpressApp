@@ -4,7 +4,7 @@ var moment = require('moment');
 var sanitizer = require('sanitizer');
 
 function creatTable() {
-    tableSvc.createTableIfNotExists('mytable', function(error, result, response) {
+    tableSvc.createTableIfNotExists('mytable', function (error, result, response) {
         if (!error) {
             // Table exists or created
         }
@@ -20,7 +20,7 @@ function insert(user, value) {
         user: entGen.String(sanitizer.escape(user))
     };
 
-    tableSvc.insertEntity('mytable', task, function(error, result, response) {
+    tableSvc.insertEntity('mytable', task, function (error, result, response) {
         if (!error) {
             // Entity inserted
         }
@@ -33,19 +33,29 @@ function query(top, cb) {
         query = query.top(top);
     }
 
-    tableSvc.queryEntities('mytable', query, null, function(error, result, response) {
+    tableSvc.queryEntities('mytable', query, null, function (error, result, response) {
         if (!error) {
-            cb(result);
+            // parse result to hide info
+            var ret = [];
+            result.entries.forEach(function (doc) {
+                var tp = {
+                    user: doc.user['_'],
+                    comment: doc.comment['_'],
+                    timestamp: doc.Timestamp['_']
+                };
+                ret.push(tp);
+            });
+            cb(ret);
         }
     });
 }
 
 module.exports = {
-    insert: function(user, value) {
+    insert: function (user, value) {
         insert(user, value);
     },
 
-    query: function(top, cb) {
+    query: function (top, cb) {
         query(top, cb);
     }
 };

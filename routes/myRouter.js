@@ -42,7 +42,9 @@ myRouter.hlRouter = function(app, hlquery) {
         else if (req.query['type'] == 2) {
             dataController.queryComment(req.body.top, res);
         }
-        else res.sendStatus(404);
+        else {
+            res.render('./comment');
+        }
     });
 
     app.use('/hl', function(req, res, next) {
