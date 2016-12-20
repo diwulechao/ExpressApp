@@ -12,9 +12,9 @@ function insert(col, data, callback) {
     });
 };
 
-function upsert(col, query,update, callback) {
+function upsert(col, query, update, callback) {
     var collection = mongodbinit.getDb().collection(col);
-    collection.updateOne(query,update,{upsert:true}, function(err,result) {
+    collection.updateOne(query, update, { upsert: true }, function (err, result) {
         callback(result);
     });
 };
@@ -58,7 +58,7 @@ function daihuan() {
 
             ret.forEach(function (doc) {
                 if (doc.value >= 10000) {
-                    upsert('c4', {date:doc.date},{ date: doc.date, value: doc.value }, function (result) { });
+                    upsert('c4', { date: doc.date }, { date: doc.date, value: doc.value }, function (result) { });
                 }
             });
         }
@@ -66,21 +66,19 @@ function daihuan() {
 }
 
 module.exports = {
-    test: function(req,res) {
+    test: function (req, res) {
         daihuan();
         res.sendStatus(204);
-    }, 
-    
+    },
+
     trigger: function () {
         // 24 hours
-        request('https://www.my089.com/Loan/default.aspx?&ou=1&mit=1&oc=3&mat=1', function (error, response, body) {
+        request.post({ url: 'http://investment.my089.com/credit/index', headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'Accept': 'application/json, text/javascript, */*; q=0.01' }, form: { currentPage: 1, lifeOfLoan_: 2, loanType_: 90, oc_: 3, ou_: 1 } }, function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                var doc = new dom().parseFromString(body);
-                var nodes = xpath.select("//dd[@class='dd_2 mar_top_18']/span/text()", doc);
-
+                var json = JSON.parse(body);
                 var array = [];
-                for (var i = 0; i < nodes.length; i++) {
-                    var val = parseFloat(nodes[i].toString());
+                for (var i = 0; i < json.list.length; i++) {
+                    var val = json.list[i].interestRate;
                     if (val <= 15 && val >= 7) {
                         array.push(val);
                     }
@@ -92,18 +90,18 @@ module.exports = {
                     if (array[i] < min) min = array[i];
                     sum += array[i];
                 }
-                
+
                 if (array.length > 0) {
-                    if (array.length>=3) {
-                        result = (sum-min-max)/(array.length-2);
+                    if (array.length >= 3) {
+                        result = (sum - min - max) / (array.length - 2);
                     }
                     else {
-                        result = sum/array.length;
+                        result = sum / array.length;
                     }
-                    
-                    insert('c2', { time: new Date().getTime(), score: result }, function (result) {});
+
+                    insert('c2', { time: new Date().getTime(), score: result }, function (result) { });
                 }
-                    
+
             }
         });
 
@@ -113,7 +111,7 @@ module.exports = {
             if (result == null || result.length == 0) {
                 var startTimestamp = parseInt(moment().utcOffset("+08:00").add(-1, 'days').hour(0).minute(0).second(0).format('x'));
                 var endTimestamp = parseInt(moment().utcOffset("+08:00").add(-1, 'days').hour(23).minute(59).second(59).format('x'));
-                    
+
                 query('c2', { time: { $gt: startTimestamp, $lt: endTimestamp } }, {}, 200, function (docs) {
                     var firstPoint = 2448427377023, lastPoint = 0;
                     var max = 0, min = 100, start = 0, end = 0;
@@ -131,18 +129,18 @@ module.exports = {
                         }
                     });
 
-                    insert('c3', { 'date': date,'min':min,'max':max,'start':start,'end':end }, function (result) { });
+                    insert('c3', { 'date': date, 'min': min, 'max': max, 'start': start, 'end': end }, function (result) { });
                 });
             }
         });
-        
+
         if (moment().utcOffset("+08:00").hour() == 8) {
             daihuan();
         }
     },
 
     query: function (req, res) {
-        var dataSet = { 'data1': {}, 'data2': {}, 'data3':{} };
+        var dataSet = { 'data1': {}, 'data2': {}, 'data3': {} };
 
         async.parallel([
             function (callback) {
@@ -174,7 +172,7 @@ module.exports = {
                     callback(null, null);
                 });
             },
-            
+
             function (callback) {
                 var data = [];
                 query('c4', {}, { 'date': -1 }, 100, function (docs) {
@@ -191,12 +189,14 @@ module.exports = {
             }
         ],
 
-        function (error, results) {
-            res.render('./hl', { title: '红岭创投净值标利率曲线', doc: { 
-                'data': dataSet.data1, 
-                'data2': dataSet.data2, 
-                'data3': dataSet.data3
-                }});
+            function (error, results) {
+                res.render('./hl', {
+                    title: '红岭创投净值标利率曲线', doc: {
+                        'data': dataSet.data1,
+                        'data2': dataSet.data2,
+                        'data3': dataSet.data3
+                    }
+                });
             }
         );
     }
